@@ -5,6 +5,8 @@ const userRoutes = require('./routes/users');
 const recordRoutes = require('./routes/records');
 const reminderRoutes = require('./routes/reminders');
 const adviceRoutes = require('./routes/advice');
+const adminRoutes = require('./routes/admin');
+const doctorRoutes = require('./routes/doctor');
 
 const app = express();
 app.use(cors());
@@ -15,6 +17,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/reminders', reminderRoutes);
 app.use('/api', adviceRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/doctor', doctorRoutes);
 
 app.get('/', (req, res) => {
   res.send('Her Health Journey Hub API');
