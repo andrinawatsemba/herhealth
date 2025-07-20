@@ -4,8 +4,22 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
-// Try importing the image directly
-const babyImage = '/imgt1.png';
+// Remove unused babyImage import
+
+const getTrimesterLabel = (trimester: number | string | undefined) => {
+  if (trimester === 1 || trimester === '1' || trimester === '1st') return '1st';
+  if (trimester === 2 || trimester === '2' || trimester === '2nd') return '2nd';
+  if (trimester === 3 || trimester === '3' || trimester === '3rd') return '3rd';
+  return '';
+};
+
+const getTrimesterImage = (trimester: number | string | undefined) => {
+  const label = getTrimesterLabel(trimester);
+  if (label === '1st') return '/trims1.png';
+  if (label === '2nd') return '/trims2.png';
+  if (label === '3rd') return '/trims3.png';
+  return null;
+};
 
 const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
@@ -47,13 +61,26 @@ const DashboardPage: React.FC = () => {
             Welcome {user?.username}
           </h2>
           
-          {/* Debug info - remove this after testing */}
-          <div className="mb-4 p-2 bg-yellow-100 rounded text-sm">
-            <p>Debug Info:</p>
-            <p>Role: {user?.role}</p>
-            <p>Trimester: {user?.trimester}</p>
-            <p>Should show image: {user?.role === 'Patient' && user?.trimester === 1 ? 'Yes' : 'No'}</p>
-          </div>
+          {/* Show trimester image for patients */}
+          {user?.role === 'Patient' && getTrimesterImage(user?.trimester) && (
+            <div className="text-center mb-4">
+              <img
+                src={getTrimesterImage(user?.trimester)}
+                alt={`Trimester ${user?.trimester} illustration`}
+                className="mx-auto max-w-xs rounded-lg shadow-md"
+                onError={(e) => {
+                  console.error('Image failed to load:', e);
+                  e.currentTarget.style.display = 'none';
+                }}
+                onLoad={() => console.log('Image loaded successfully')}
+              />
+              <p className="text-lg font-medium text-orange-600 mt-2">
+                {getTrimesterLabel(user?.trimester) === '1st' && 'First Trimester'}
+                {getTrimesterLabel(user?.trimester) === '2nd' && 'Second Trimester'}
+                {getTrimesterLabel(user?.trimester) === '3rd' && 'Third Trimester'}
+              </p>
+            </div>
+          )}
           
           {/* Show baby size image only for 1st trimester patients */}
           {user?.role === 'Patient' && user?.trimester === 1 && (
@@ -98,7 +125,7 @@ const DashboardPage: React.FC = () => {
                 </div>
                 {user?.role === 'Patient' && user?.trimester && (
                   <div>
-                    <span className="font-medium">Trimester:</span> {user.trimester}
+                    <span className="font-medium">Trimester:</span> {getTrimesterLabel(user.trimester)}
                   </div>
                 )}
               </div>
@@ -158,7 +185,7 @@ const DashboardPage: React.FC = () => {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium">Pregnancy Progress</span>
                       <span className="text-sm text-gray-500">
-                        Trimester {user.trimester}
+                        Trimester {getTrimesterLabel(user.trimester)}
                       </span>
                     </div>
                     <div className="w-full bg-orange-200 rounded-full h-2">
@@ -173,7 +200,7 @@ const DashboardPage: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="text-center p-4 bg-orange-50 rounded-lg">
                       <div className="text-2xl font-bold text-orange-600">
-                        {user.trimester}
+                        {getTrimesterLabel(user.trimester)}
                       </div>
                       <div className="text-sm text-gray-600">Current Trimester</div>
                     </div>
